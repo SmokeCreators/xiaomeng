@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#0d1118"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><title>SIM-коллекция</title>
+<style>
+:root{--bg:#eef1f6;--panel:#fff;--text:#141824;--mut:#5d667a;--line:#dbe0ea;--acc:#2f6bff;--accT:#fff;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0d1118;--panel:#171d29;--text:#eef1f7;--mut:#8f99ad;--line:#262e40;--acc:#5b8cff}}
+:root[data-theme="dark"]{--bg:#0d1118;--panel:#171d29;--text:#eef1f7;--mut:#8f99ad;--line:#262e40;--acc:#5b8cff}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{height:100%;margin:0}
+body{display:flex;flex-direction:column;background:var(--bg);color:var(--text);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-tap-highlight-color:transparent;user-select:none}
+header{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px 14px}
+.chip{background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-weight:700;font-variant-numeric:tabular-nums}
+main{flex:1;overflow:auto;padding:0 14px 14px;position:relative}
+.view{display:none;min-height:100%}.view.on{display:flex;flex-direction:column}
+#gen{align-items:center;justify-content:center;gap:18px;text-align:center}
+.hint{color:var(--mut)}
+#cardbox{width:100%;display:flex;justify-content:center}
+.card{--rc:#8f99ad;width:min(94%,420px);min-height:170px;flex:none;aspect-ratio:1.6;border-radius:18px;background:linear-gradient(145deg,#fff,#dde3ef);color:#141824;position:relative;box-shadow:0 0 0 3px var(--rc),0 14px 40px -10px var(--rc);animation:pop .22s ease-out;text-align:left}
+@keyframes pop{from{transform:scale(.86) rotate(-3deg);opacity:0}}
+@media (prefers-reduced-motion:reduce){.card{animation:none}}
+.op{position:absolute;left:16px;top:14px;display:flex;align-items:center;gap:8px;font-weight:800;font-size:18px}
+.op i{width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-style:normal;font-size:15px}
+.rar{position:absolute;left:16px;top:50px;font-size:13px;font-weight:700;background:var(--rc);color:#fff;padding:1px 10px;border-radius:999px}
+.chipic{position:absolute;right:18px;top:16px;width:56px;height:42px;border-radius:8px;background:linear-gradient(135deg,#f6d98a,#b88a2a)}
+.num{position:absolute;left:16px;bottom:16px;font-weight:800;font-size:clamp(20px,6.6vw,30px);letter-spacing:.3px}
+.price{position:absolute;right:16px;bottom:18px;font-size:12px;opacity:.85}
+button{font:inherit;color:inherit;border:0;cursor:pointer}
+.btn{background:var(--acc);color:var(--accT);border-radius:12px;padding:12px 16px;font-weight:700}
+.btn.sec{background:var(--panel);color:var(--text);border:1px solid var(--line)}
+.btn[disabled]{opacity:.45}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--panel);border:1px solid var(--line);border-left:5px solid var(--rc,var(--line));border-radius:12px;padding:10px 12px;margin-bottom:8px}
+.row b{font-variant-numeric:tabular-nums}.row small{color:var(--mut);display:block}
+.slot{margin-top:auto;border:1px dashed var(--line);border-radius:10px;padding:14px;text-align:center;color:var(--mut);font-size:13px}
+nav{display:flex;border-top:1px solid var(--line);background:var(--panel)}
+nav button{flex:1;padding:14px 4px;background:none;color:var(--mut);font-weight:700;font-size:14px}
+nav button.on{color:var(--acc);box-shadow:inset 0 3px 0 var(--acc)}
+#toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 64px);transform:translateX(-50%);background:var(--text);color:var(--bg);padding:8px 14px;border-radius:10px;font-weight:700;opacity:0;pointer-events:none;transition:opacity .2s;z-index:5}
+#toast.on{opacity:1}
+#ad{position:fixed;inset:0;background:rgba(0,0,0,.85);color:#fff;display:none;align-items:center;justify-content:center;text-align:center;z-index:9;padding:20px}
+#ad.on{display:flex}
+.plan{position:absolute;left:16px;right:16px;bottom:58px;display:flex;gap:6px;font-size:clamp(10px,3vw,12px);font-weight:700}
+.plan span{background:rgba(128,128,128,.28);border-radius:999px;padding:3px 8px;white-space:nowrap}
+#vw,#types{position:fixed;inset:0;background:rgba(0,0,0,.82);display:none;align-items:center;justify-content:center;z-index:8;padding:16px;overflow:auto}
+#vw.on,#types.on{display:flex}
+#bar{display:none;gap:8px;padding:10px 14px;background:var(--panel);border-top:1px solid var(--line)}body.g #bar{display:flex}
+#menu{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;z-index:7}#menu.on{display:block}
+.mbox{position:absolute;left:0;top:0;bottom:0;width:min(78%,300px);background:var(--panel);padding:calc(env(safe-area-inset-top,0px) + 64px) 12px 12px;display:flex;flex-direction:column;gap:8px;animation:slide .2s}
+.mbox button{text-align:left;background:var(--bg);border-radius:12px;padding:14px;font-weight:700}
+@keyframes slide{from{transform:translateX(-100%)}}
+.card.roll{--rc:#8f99ad !important}.card.roll .rar,.card.roll .price{visibility:hidden}.card.roll .num{opacity:.8}
+.card.tense{animation:tense .18s linear infinite}
+@keyframes tense{0%,100%{transform:translate(0,0)}25%{transform:translate(1.5px,-1px)}75%{transform:translate(-1.5px,1px)}}
+.card.lands{animation:land .35s ease-out}
+@keyframes land{0%{transform:scale(1.08)}100%{transform:scale(1)}}
+.card.lands3{animation:land .5s ease-out,glow 1.2s ease-in-out infinite}
+.card.lands4{animation:shake .6s,glow .9s ease-in-out infinite}
+@keyframes shake{0%,100%{transform:none}20%{transform:translateX(-8px) rotate(-1deg)}40%{transform:translateX(8px) rotate(1deg)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+@keyframes glow{0%,100%{box-shadow:0 0 0 3px var(--rc),0 14px 40px -10px var(--rc)}50%{box-shadow:0 0 0 4px var(--rc),0 0 60px 8px var(--rc)}}
+#flash{position:fixed;inset:0;pointer-events:none;opacity:0;z-index:6}#flash.on{animation:fl .9s ease-out}
+@keyframes fl{0%{opacity:.75}100%{opacity:0}}
+.pt{position:fixed;width:8px;height:8px;border-radius:2px;pointer-events:none;z-index:6;animation:pt .9s ease-out forwards}
+@keyframes pt{to{transform:translate(var(--x),var(--y)) rotate(360deg);opacity:0}}
+.flt{position:fixed;transform:translate(-50%,-50%);font-weight:800;pointer-events:none;z-index:6;animation:flt .9s ease-out forwards;text-shadow:0 1px 4px rgba(0,0,0,.5)}
+@keyframes flt{to{transform:translate(-50%,-90px);opacity:0}}
+@media (prefers-reduced-motion:reduce){.pt,.flt{display:none}}
+@media (prefers-reduced-motion:reduce){.card.tense,.card.lands,.card.lands3,.card.lands4,#flash.on{animation:none}}
+.vbox{width:100%;max-width:440px;display:flex;flex-direction:column;align-items:center;gap:14px}
+.vbox .card{width:100%}
+.bars{width:100%;background:var(--panel);border-radius:14px;padding:10px 14px;box-sizing:border-box}
+.bar{margin:10px 0}.bar>div{display:flex;justify-content:space-between;font-size:14px}
+.bar i{display:block;height:8px;border-radius:5px;background:var(--line);overflow:hidden;margin-top:4px}
+.bar u{display:block;height:100%;border-radius:5px;text-decoration:none}
+.vbtn{display:flex;gap:8px;width:100%}.vbtn .btn{flex:1}
+</style>
+</head>
+<body class="g">
+<header><button class="chip" id="mb" aria-label="Меню" style="font-size:20px;padding:4px 14px;line-height:1.2">⋮</button><div class="chip" id="money">0 ₽</div><div class="chip" id="info"></div></header>
+<main>
+ <section class="view on" id="gen">
+  <div id="cardbox"><p class="hint">Нажмите в любом месте,<br>чтобы открыть SIM-карту</p></div>
+  
+  <button class="btn sec" id="pz"></button>
+  <div class="hint" id="last"></div>
+  <div class="hint" id="lk" style="font-size:13px"></div>
+ </section>
+ <section class="view" id="col">
+  <div style="display:flex;gap:8px;margin-bottom:10px"><button class="btn sec" id="sellRare" style="flex:1">Продать «Редкие»</button><button class="btn sec" id="sellEpic" style="flex:1">Продать «Эпические»</button></div>
+  <button class="btn sec" id="sellAll" style="width:100%;margin-bottom:10px">Продать всё</button>
+  <p class="hint" style="margin:0 0 8px">Нажмите на номер, чтобы открыть карточку</p><div id="list"></div>
+  
+ </section>
+ <section class="view" id="upg"><p class="hint" style="margin:0 0 8px">Бонус и заказы</p><div class="row"><div><b>Бонус дня</b><small id="dlt"></small></div><button class="btn sec" id="dlb">Забрать</button></div><div class="row"><div><b id="odt">Заказ</b><small id="odm"></small></div><div style="display:flex;gap:6px"><button class="btn sec" id="odb">Сдать</button><button class="btn sec" id="osk" aria-label="Другой заказ">↻</button></div></div><p class="hint" style="margin:0 0 8px">Ежедневные задания</p><div id="tasks"></div><p class="hint" style="margin:8px 0">Улучшения</p><div id="ups"></div></section>
+ <section class="view" id="lbv"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><b>Топ-20 по капиталу</b><button class="btn sec" id="lbr">Обновить</button></div><div id="lbl"></div></section>
+ <section class="view" id="safe"><p class="hint" id="sinfo" style="margin:0 0 8px"></p><div id="slist"></div></section>
+ <section class="view" id="sta"><div id="stl"></div></section>
+ <section class="view" id="set"><div id="sets"></div><div class="row"><div><b>Статистика</b><small id="stt"></small></div></div><p class="hint" style="font-size:12px;margin-top:12px">Версия 1.0. Все номера и операторы вымышленные, игра не связана с реальными компаниями. В игре нет азартных игр на реальные деньги и покупок.</p></section>
+</main>
+<div id="bar"><button class="btn sec" id="tyb" style="flex:1"></button></div>
+<div id="toast"></div>
+<div id="vw"></div>
+<div id="types"></div>
+<div id="flash"></div>
+<div id="menu"><div class="mbox"><button data-v="gen">🎰 Генератор</button><button data-v="col">🗂 Коллекция</button><button data-v="upg">⬆ Улучшения и задания</button><button data-v="safe">🔒 Сейф</button><button data-v="sta">📊 Статистика</button><button data-v="set">⚙ Настройки</button></div></div>
+<script>
+const J=(d,a,b)=>d.slice(a,b).join("");
+const O=(n,c,g,t,sh,m)=>({n,c,g,t,sh,m});
+const TY=[
+{n:"Россия",p:"+7",cost:4,m:1,b:0,c:"#2f7bff",s:"+7 981 234-56-78",ops:[O("Вэйвком","#17a36b","linear-gradient(135deg,#22c177,#0b6b47)","#fff","12px",1),O("Лайтсим","#f2b800","linear-gradient(135deg,#ffd21a,#f2a900)","#111","50%",1.2),O("Рубин","#e53935","linear-gradient(135deg,#ff4b3e,#a8120a)","#fff","8px",1.3),O("СеверТел","#2f7bff","linear-gradient(135deg,#232c3d,#0c121e)","#fff","6px 14px",1.5)],i:d=>{d[0]=9},f:d=>`+7 ${J(d,0,3)} ${J(d,3,6)}-${d[6]}${d[7]}-${d[8]}${d[9]}`},
+{n:"США",p:"+1",cost:30,m:7,b:.01,c:"#3b5bdb",s:"+1 (415) 555-0123",ops:[O("Redline","#e00000","linear-gradient(135deg,#2a2a2a,#0a0a0a)","#fff","4px",1),O("Bluewave","#0a8fd6","linear-gradient(135deg,#19b2f0,#0057b8)","#fff","50%",1.2),O("Pinkfox","#e20074","linear-gradient(135deg,#f0359b,#a1004f)","#fff","10px",1.4)],i:d=>{d[0]=2+Math.floor(Math.random()*8)},f:d=>`+1 (${J(d,0,3)}) ${J(d,3,6)}-${J(d,6,10)}`},
+{n:"ОАЭ",p:"+971",cost:160,m:35,b:.02,c:"#c8a24a",s:"+971 50 123 4567",ops:[O("Palmcom","#00a651","linear-gradient(135deg,#17c46a,#006b3a)","#fff","50% 10%",1),O("Duneline","#b21f66","linear-gradient(135deg,#1a2a6c,#b21f66)","#fff","10px 50%",1.3)],i:d=>{},f:d=>`+971 5${d[2]} ${J(d,3,6)} ${J(d,6,10)}`},
+{n:"Анонимные",p:"+888",cost:1200,m:250,b:.03,c:"#8b5cf6",s:"+888 0123 4567",ops:[O("Nimbus","#0098ea","linear-gradient(135deg,#1db1ff,#6a4bff)","#fff","50%",1),O("Ghost-X","#c9a227","linear-gradient(135deg,#14141c,#2c2352)","#e6dcff","4px 16px",1.6)],i:d=>{},f:d=>`+888 ${J(d,2,6)} ${J(d,6,10)}`}];
+const OPS=[{n:"Вэйвком",c:"#17a36b",m:1},{n:"Лайтсим",c:"#f2b800",m:1.2},{n:"Рубин",c:"#e53935",m:1.3},{n:"СеверТел",c:"#2f7bff",m:1.5}];
+const R=[{n:"Обычный",c:"#8f99ad",v:2},{n:"Редкий",c:"#3aa0ff",v:20},{n:"Эпический",c:"#a05bff",v:150},{n:"Легендарный",c:"#ffb020",v:2000},{n:"Мифический",c:"#ff4d6a",v:25000}];
+const UP=[{k:"auto",n:"Авто-открытие",d:"+0,5 карты в секунду",base:400,g:2.1,max:20},{k:"luck",n:"Удача",d:"Чаще выпадают красивые номера",base:800,g:2.6,max:15},{k:"price",n:"Цена продажи",d:"+25% к цене карт",base:600,g:2.4,max:20},{k:"safe",n:"Слоты сейфа",d:"+5 мест в сейфе",base:1500,g:2.2,max:10}];
+const fresh=()=>({money:40,cards:[],lv:{auto:0,luck:0,price:0,safe:0},opened:0,t:Date.now(),boost:0,id:1,type:0,safe:[],set:{theme:"auto",pause:false,vib:true,as:true,ar:[1,0,0,0,0],snd:true,fx:true}});let S=fresh();
+const $=id=>document.getElementById(id);
+const r10=()=>Math.floor(Math.random()*10);
+const fmt=n=>Math.floor(n).toLocaleString("ru-RU");
+const lad=a=>a.every((v,i)=>i==0||v==(a[i-1]+1)%10);
+const ladD=a=>a.every((v,i)=>i==0||v==(a[i-1]+9)%10);
+function rate(d){const s=d.slice(3),q=s.slice(3);let t=1;for(let i=6;i>0&&s[i]===s[i-1];i--)t++;
+ const pal=s.join("")===s.slice().reverse().join("");
+ if(t==7)return 4;
+ if(t>=5||lad(s)||ladD(s))return 3;
+ if(t==4||pal)return 2;
+ if(t==3||(q[0]==q[3]&&q[1]==q[2])||(q[0]==q[2]&&q[1]==q[3])||(s[5]==0&&s[6]==0)||lad(q)||ladD(q))return 1;
+ return 0}
+function gen(){const d=Array.from({length:10},r10);TY[S.type].i(d);
+ if(Math.random()<0.05+0.015*S.lv.luck+TY[S.type].b){const w=Math.random(),k=w<.62?3:w<.84?4:w<.94?5:w<.985?6:7,x=r10();for(let i=10-k;i<10;i++)d[i]=x}
+ const o=Math.floor(Math.random()*TY[S.type].ops.length);
+ return{id:S.id++,num:TY[S.type].f(d),r:rate(d),o:o,t:S.type}}
+const opOf=c=>{const t=TY[c.t||0];return t.ops[c.o%t.ops.length]};
+const lucky=()=>Math.floor(Date.now()/864e5)%10;
+const hit=c=>c.num.replace(/\D/g,"").slice(-7).split(String(lucky())).length-1>=3;
+const val=c=>Math.floor(R[c.r].v*opOf(c).m*TY[c.t||0].m*(1+0.25*S.lv.price)*(S.boost>Date.now()?2:1)*(hit(c)?1.5:1));
+const GB=[3,5,10,15,20,30,50,100,0],MN=[100,300,500,800,1200,3000,0],SM=[50,100,150,300,500,0];
+function plan(c){const h=Math.imul(c.id,2654435761)>>>0;
+ const a=Math.min(8,(h>>>3)%4+c.r*2),b=Math.min(6,(h>>>7)%3+Math.floor(c.r*1.5)),s=Math.min(5,(h>>>11)%3+c.r);
+ return{a,b,s,gb:GB[a]?GB[a]+" ГБ":"Безлимит",mn:MN[b]?MN[b]+" мин":"Безлимит",sm:SM[s]?SM[s]+" SMS":"Безлимит"}}
+function cardHtml(c){const r=R[c.r],o=opOf(c),p=plan(c);return`<div class="card" style="--rc:${r.c};background:${o.g};color:${o.t}"><div class="op"><i style="background:${o.t};color:${o.c};border-radius:${o.sh}">${o.n[0]}</i>${o.n}</div><div class="rar">${r.n}</div><div class="chipic"></div><div class="plan"><span>🌐 ${p.gb}</span><span>📞 ${p.mn}</span><span>✉ ${p.sm}</span></div><div class="num">${c.num}</div><div class="price">${hit(c)?"★ ":""}${fmt(val(c))} ₽</div></div>`}
+function openView(id){const ins=S.safe.some(x=>x.id==id),c=S.cards.find(x=>x.id==id)||S.safe.find(x=>x.id==id);if(!c)return;const p=plan(c);
+ const bar=(l,v,t,m)=>`<div class="bar"><div><span>${l}</span><b>${v}</b></div><i><u style="width:${Math.round((t+1)/m*100)}%;background:${R[c.r].c}"></u></i></div>`;
+ $("vw").innerHTML=`<div class="vbox">${cardHtml(c)}<div class="bars">${bar("Интернет",p.gb,p.a,9)}${bar("Минуты",p.mn,p.b,7)}${bar("SMS",p.sm,p.s,6)}</div><div class="vbtn">${ins?`<button class="btn" data-unsafe="${c.id}">Достать</button>`:`<button class="btn" data-s="${c.id}">Продать ${fmt(val(c))} ₽</button><button class="btn sec" data-tosafe="${c.id}">🔒 В сейф</button>`}<button class="btn sec" data-close="1">Закрыть</button></div></div>`;$("vw").classList.add("on")}
+let lastCard=null,dirty=false,man=false,busy=0,rt=null,lt=0;
+function spinCost(){const t=TY[S.type];return S.money<t.cost&&!S.cards.length&&S.type==0?0:t.cost}
+function open1(){const cs=spinCost();if(S.money<cs)return false;S.money-=cs;const c=gen();S.opened++;lastCard=c;const Q=q();Q.p.open++;if(c.r>=1)Q.p.rare++;const X=st();X.sp+=cs;X.rc[c.r]++;X.tc[c.t]++;const v=val(c);if(v>X.best){X.best=v;X.bn=c.num}if((S.set.as&&S.set.ar[c.r])||S.cards.length>=1500){S.money+=v;X.er+=v;X.sd++}else S.cards.push(c);dirty=true;return true}
+function put(el,h){if(el._h!==h){el._h=h;el.innerHTML=h}}
+function render(){$("pz").style.display=S.lv.auto>0?"":"none";$("pz").textContent=S.set.pause?"▶ Включить авто-открытие":"⏸ Пауза авто-открытия";$("tyb").textContent=TY[S.type].n+" "+TY[S.type].p+" · "+fmt(spinCost())+" ₽ за карту ▾";$("lk").textContent="Счастливая цифра сегодня: "+lucky()+" (3+ раза в номере — цена ×1,5)";
+ $("money").textContent=fmt(S.money)+" ₽";
+ const b=S.boost>Date.now();$("info").textContent=b?"×2 ещё "+Math.ceil((S.boost-Date.now())/1000)+" с":"Открыто: "+fmt(S.opened);
+ if(lastCard&&dirty){if(man||lastCard.r>=3)reveal(lastCard);else $("cardbox").innerHTML=cardHtml(lastCard);man=false;$("last").textContent=lastCard.r==0?"Обычные карты продаются сразу":"Карта добавлена в коллекцию";dirty=false}
+ if($("col").classList.contains("on"))renderCol();if($("upg").classList.contains("on")){renderUp();updateTasks()}if($("set").classList.contains("on"))renderSet();if($("safe").classList.contains("on"))renderSafe();if($("sta").classList.contains("on"))renderSta()}
+function renderCol(){const L=S.cards.slice().sort((a,b)=>b.r-a.r||b.id-a.id).slice(0,60);
+ put($("list"),L.length?L.map(c=>`<div class="row" style="--rc:${R[c.r].c}"><div data-view="${c.id}" style="flex:1;cursor:pointer"><b>${c.num}</b><small>${opOf(c).n} · ${R[c.r].n}${hit(c)?" · ★ счастливый":""}</small></div><button class="btn sec" data-s="${c.id}">${fmt(val(c))} ₽</button></div>`).join("")+(S.cards.length>60?`<p class="hint">Показаны 60 лучших из ${S.cards.length}</p>`:""):`<p class="hint">Пока пусто. Откройте карты в генераторе.</p>`)}
+function cost(u){return Math.floor(u.base*Math.pow(u.g,S.lv[u.k]))}
+function renderUp(){put($("ups"),UP.map(u=>{const l=S.lv[u.k],mx=l>=u.max;return`<div class="row"><div><b>${u.n} · ур. ${l}</b><small>${u.d}</small></div><button class="btn" data-u="${u.k}" ${mx||S.money<cost(u)?"disabled":""}>${mx?"Макс.":fmt(cost(u))+" ₽"}</button></div>`}).join(""))}
+let rs=0,sa=0;
+function st(){if(!S.st)S.st={sp:0,er:0,sd:0,rc:[0,0,0,0,0],tc:[0,0,0,0],best:0,bn:""};return S.st}
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+const DR=[100,250,600,1500,4000,10000,30000];
+function dlInfo(){const D=S.dl||(S.dl={d:0,s:0}),t=Math.floor(Date.now()/864e5),got=D.d==t,n=got?D.s:(D.d==t-1?D.s%7+1:1);return{D,t,got,n}}
+function updateDl(){const i=dlInfo(),b=$("dlb");$("dlt").textContent=i.got?"День "+i.n+" из 7 получен. Завтра: +"+fmt(DR[i.n%7])+" ₽":"День "+i.n+" из 7: +"+fmt(DR[i.n-1])+" ₽";b.disabled=i.got;b.className="btn"+(i.got?" sec":"");b.textContent=i.got?"Получено":"Забрать"}
+function newOrder(){const t=Math.floor(Math.random()*(S.type+1)),w=Math.random(),r=w<.6?1:w<.9?2:3,n=TY[t].ops.length,o=Math.random()<.5?Math.floor(Math.random()*n):-1;S.od={t,r,o,exp:Date.now()+20*60e3,rw:Math.floor(R[r].v*TY[t].m*2.5*(1+0.25*S.lv.price))}}
+function odMatch(){const O=S.od;return S.cards.filter(c=>(c.t||0)==O.t&&c.r>=O.r&&(O.o<0||c.o==O.o)).sort((a,b)=>a.r-b.r||val(a)-val(b))[0]}
+function updateOrder(){if(!S.od||S.od.exp<Date.now())newOrder();const O=S.od,m=odMatch(),left=Math.max(0,Math.ceil((O.exp-Date.now())/1000));
+ $("odt").textContent="Нужен номер: "+TY[O.t].n+" "+TY[O.t].p+(O.o>=0?" · "+TY[O.t].ops[O.o].n:"")+" · не ниже «"+R[O.r].n+"»";
+ $("odm").textContent="Награда: "+fmt(O.rw)+" ₽ · осталось "+Math.floor(left/60)+":"+String(left%60).padStart(2,"0")+(m?"":" · нужна карта в коллекции");
+ $("odb").disabled=!m;$("odb").className="btn"+(m?"":" sec")}
+let cdb=null,cuid=null,cst="",lco=-1,cl2=0;
+async function cloudInit(){try{if(!window.claude||!claude.use)return;const d=await claude.use("db"),u=await claude.use("user");const id=u?await u.id():null;if(d&&id){cdb=d;cuid=id}}catch(e){cdb=null}render()}
+function snap(){const o=JSON.parse(JSON.stringify(S));o.cards=S.cards.slice().sort((a,b)=>b.r-a.r||val(b)-val(a)).slice(0,400);return o}
+async function cloudSave(man){if(!cdb){if(man)toast("Облако недоступно");return}
+ try{await cdb.collection("data/users/"+cuid).doc("save").set({j:JSON.stringify(snap()),t:Date.now(),m:Math.floor(S.money)});cst="Сохранено в облако: "+new Date().toLocaleTimeString("ru-RU");if(man)toast("Сохранено в облако");lbPush()}catch(e){cst="Ошибка облака";if(man)toast("Не удалось сохранить в облако")}render()}
+async function cloudLoad(){if(!cdb){toast("Облако недоступно");return}
+ try{const s=await cdb.collection("data/users/"+cuid).doc("save").get();if(!s.exists){toast("В облаке пока ничего нет");return}
+  const o=JSON.parse(s.data().j);S=Object.assign(fresh(),o);S.lv=Object.assign({auto:0,luck:0,price:0,safe:0},o.lv);S.set=Object.assign({theme:"auto",pause:false,vib:true,as:true,ar:[1,0,0,0,0],snd:true,fx:true},o.set);S.safe=S.safe||[];lastCard=null;applyTheme();save();toast("Загружено из облака");render()}catch(e){toast("Не удалось загрузить")}}
+async function lbPush(){if(!cdb)return;try{const X=st(),cap=S.money+S.cards.reduce((m,c)=>m+val(c),0)+S.safe.reduce((m,c)=>m+val(c),0);await cdb.collection("lb").doc(cuid).set({score:Math.floor(cap),best:X.best,bn:X.bn,n:S.opened,t:Date.now()})}catch(e){}}
+async function renderLb(){const box=$("lbl");if(!cdb){box.innerHTML='<p class="hint">Рейтинг работает при входе в claude.ai. Для версии Google Play нужен свой сервер.</p>';return}
+ await lbPush();
+ try{const q=await cdb.collection("lb").orderBy("score","desc").limit(20).get(),ds=q.docs,u=await claude.use("user"),pr=await u.profiles(ds.map(d=>d.id));
+  box.innerHTML=ds.length?ds.map((d,i)=>{const x=d.data(),p=pr[d.id]||{},me=d.id==cuid;return`<div class="row" style="--rc:${me?"var(--acc)":"var(--line)"}"><div><b>${i+1}. ${esc(p.name||"Игрок")}${me?" (вы)":""}</b><small>Лучшая карта: ${esc(x.bn||"—")} · открыто ${fmt(x.n||0)}</small></div><b>${fmt(x.score||0)} ₽</b></div>`}).join(""):'<p class="hint">Пока никого. Станьте первым!</p>'}catch(e){box.innerHTML='<p class="hint">Не удалось загрузить рейтинг.</p>'}}
+function renderSafe(){const cap=5+5*S.lv.safe,L=S.safe.slice().sort((a,b)=>b.r-a.r||b.id-a.id);
+ $("sinfo").textContent="Сейф: "+S.safe.length+" / "+cap+". Карты внутри не продаются ни вручную, ни автоматически.";
+ put($("slist"),L.length?L.map(c=>`<div class="row" style="--rc:${R[c.r].c}"><div data-view="${c.id}" style="flex:1;cursor:pointer"><b>${c.num}</b><small>${opOf(c).n} · ${R[c.r].n} · ${fmt(val(c))} ₽</small></div><span>🔒</span></div>`).join(""):`<p class="hint">Сейф пуст. Откройте карту в коллекции и нажмите «В сейф».</p>`)}
+function renderSta(){const X=st(),tot=Math.max(1,S.opened);
+ put($("stl"),`<div class="row" style="display:block"><b>Итоги</b><small>Открыто карт: ${fmt(S.opened)}<br>Потрачено: ${fmt(X.sp)} ₽<br>Заработано продажей: ${fmt(X.er)} ₽<br>Продано карт: ${fmt(X.sd)}<br>Прибыль: ${fmt(X.er-X.sp)} ₽</small></div><div class="row" style="display:block"><b>Выпало по редкости</b>${R.map((r,i)=>`<div class="bar"><div><span>${r.n}</span><b>${fmt(X.rc[i])}</b></div><i><u style="width:${Math.round(X.rc[i]/tot*100)}%;background:${r.c}"></u></i></div>`).join("")}</div><div class="row" style="display:block"><b>По типам номеров</b><small>${TY.map((t,i)=>t.n+" "+t.p+": "+fmt(X.tc[i])).join("<br>")}</small></div><div class="row" style="display:block"><b>Самая дорогая карта</b><small>${X.best?X.bn+" · "+fmt(X.best)+" ₽":"Пока нет"}</small></div>`)}
+const TK=[{n:"Откройте 100 карт",k:"open",g:100,rw:500},{n:"Найдите 5 редких и выше",k:"rare",g:5,rw:2000},{n:"Продайте 10 карт вручную",k:"sell",g:10,rw:1000}];
+function q(){const d=Math.floor(Date.now()/864e5);if(!S.q||S.q.d!==d)S.q={d,p:{open:0,rare:0,sell:0},c:[0,0,0]};return S.q}
+function buildTasks(){$("tasks").innerHTML=TK.map((k,i)=>`<div class="row"><div><b>${k.n}</b><small id="tp${i}"></small></div><button class="btn sec" id="tb${i}" data-claim="${i}"></button></div>`).join("")}
+function updateTasks(){const Q=q();TK.forEach((k,i)=>{const p=Math.min(Q.p[k.k],k.g),dn=Q.c[i],ok=p>=k.g,b=$("tb"+i);$("tp"+i).textContent=p+" / "+k.g;b.disabled=!!dn||!ok;b.className="btn"+(ok&&!dn?"":" sec");b.textContent=dn?"Получено":(ok?"Забрать ":"")+"+"+fmt(k.rw)+" ₽"});updateOrder();updateDl()}
+function applyTheme(){const h=document.documentElement,t=S.set.theme;if(t=="auto")h.removeAttribute("data-theme");else h.dataset.theme=t}
+function resetAll(){try{["main","bak1","bak2","bak3"].forEach(k=>localStorage.removeItem(K+k))}catch(e){}S=fresh();lastCard=null;acc=0;rs=0;$("cardbox").innerHTML='<p class="hint">Нажмите в любом месте,<br>чтобы открыть SIM-карту</p>';$("last").textContent="";applyTheme();toast("Прогресс сброшен")}
+function renderSet(){const th=S.set.theme,b=(k,l)=>`<button class="btn ${th==k?"":"sec"}" data-th="${k}" style="flex:1">${l}</button>`;
+ put($("sets"),`<div class="row" style="display:block"><b>Тема</b><div style="display:flex;gap:8px;margin-top:8px">${b("auto","Авто")}${b("light","Светлая")}${b("dark","Тёмная")}</div></div><div class="row"><div><b>Авто-открытие</b><small>${S.lv.auto>0?"Скорость: "+S.lv.auto/2+" карт/с":"Купите в «Улучшениях»"}</small></div><button class="btn sec" data-pause="1" ${S.lv.auto>0?"":"disabled"}>${S.set.pause?"Выключено":"Включено"}</button></div><div class="row"><div><b>Автопродажа</b><small>Продаёт новые карты сразу</small></div><button class="btn sec" data-as="1">${S.set.as?"Включена":"Выключена"}</button></div><div class="row" style="display:block"><b>Какие продавать</b><div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">${R.map((r,i)=>`<button class="btn ${S.set.ar[i]?"":"sec"}" data-ar="${i}" style="padding:8px 12px;font-size:14px">${r.n}</button>`).join("")}</div></div><div class="row"><div><b>Звук</b><small>Мелодии при выпадении и продаже</small></div><button class="btn sec" data-snd="1">${S.set.snd?"Включён":"Выключен"}</button></div><div class="row"><div><b>Эффекты</b><small>Частицы и всплывающие надписи</small></div><button class="btn sec" data-fx="1">${S.set.fx?"Включены":"Выключены"}</button></div><div class="row"><div><b>Вибрация</b><small>На эпических и выше при тапе</small></div><button class="btn sec" data-vib="1">${S.set.vib?"Включена":"Выключена"}</button></div><div class="row"><div><b>Счастливая цифра: ${lucky()}</b><small>Если она встречается 3+ раза в последних 7 цифрах номера, цена ×1,5. Меняется каждый день.</small></div></div><div class="row"><div><b>Сброс прогресса</b><small>Удалит всё без возврата</small></div><button class="btn sec" data-reset="1">Сбросить</button></div>`);
+ const best=S.cards.reduce((m,c)=>Math.max(m,val(c)),0);
+ $("stt").innerHTML=`Открыто: ${fmt(S.opened)} · В коллекции: ${fmt(S.cards.length)}<br>Самая дорогая карта: ${fmt(best)} ₽`}
+function openTypes(){$("types").innerHTML=`<div class="vbox"><b style="color:#fff;font-size:18px">Тип номера</b>${TY.map((t,i)=>`<div class="row" data-ty="${i}" style="width:100%;box-sizing:border-box;cursor:pointer;--rc:${i==S.type?t.c:"var(--line)"}"><div><b>${t.n} ${t.p}</b><small>${t.s}<br>${t.ops.map(o=>o.n).join(" · ")}<br>Цена карты: ${fmt(t.cost)} ₽ · ценность ×${t.m}</small></div><span>${i==S.type?"✓":""}</span></div>`).join("")}<button class="btn sec" data-close2="1" style="width:100%">Закрыть</button></div>`;$("types").classList.add("on")}
+function reveal(c){const box=$("cardbox");box.innerHTML=cardHtml(c);const el=box.firstChild,nm=el.querySelector(".num"),T=c.num,D=[350,600,900,1500,2600][c.r],s0=T.indexOf(" ")+1,ix=[];
+ for(let i=s0;i<T.length;i++)if(/\d/.test(T[i]))ix.push(i);
+ el.classList.add("roll");if(c.r>=3){el.classList.add("tense");busy=Date.now()+D+400}
+ const t0=Date.now();let pn=0;clearInterval(rt);
+ rt=setInterval(()=>{const e=Date.now()-t0;let s="",n=0;for(let i=0;i<T.length;i++){const k=ix.indexOf(i),lk=k>=0&&e>=D*(.25+.75*Math.pow((k+1)/ix.length,c.r>=3?2.2:1));s+=k<0||lk?T[i]:r10();if(lk)n++}
+  if(n>pn){pn=n;sfx("tick",n)}nm.textContent=s;
+  if(e>=D){clearInterval(rt);nm.textContent=T;sfx("land",c.r);fx(c.r,el);el.classList.remove("roll","tense");el.classList.add("lands"+(c.r>=3?c.r:""));
+   if(c.r>=3){const f=$("flash");f.style.background=R[c.r].c;f.classList.remove("on");void f.offsetWidth;f.classList.add("on")}}},45)}
+let AC=null;const SC=[523,659,784,988,1175,1568];
+function tone(f,d,t0=0,type="sine",v=.15){if(!S.set.snd)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state=="suspended")AC.resume();const o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime+t0;o.type=type;o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+.01);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+d+.02)}catch(e){}}
+function sfx(k,r){if(k=="tick")tone(300+r*40,.05,0,"square",.05);
+ if(k=="land"){if(r==0)tone(440,.08,0,"triangle",.08);else if(r==1){tone(SC[0],.15);tone(SC[2],.25,.08)}else if(r==2){[0,2,4].forEach((i,j)=>tone(SC[i],.25,j*.09))}else if(r==3){[0,1,2,3,4].forEach((i,j)=>tone(SC[i],.3,j*.08,"triangle",.18));tone(80,.5,0,"sine",.3)}else{tone(55,1,0,"sine",.45);[0,1,2,3,4,5].forEach((i,j)=>tone(SC[i],.5,.15+j*.1,"triangle",.2));tone(SC[5]*2,1,.8,"sine",.12)}}
+ if(k=="coin"){tone(988,.08,0,"square",.07);tone(1319,.18,.07,"square",.07)}
+ if(k=="ok"){tone(784,.12);tone(1047,.2,.1)}
+ if(k=="err")tone(160,.2,0,"sawtooth",.08)}
+function fx(r,el){if(r>=3&&S.set.vib&&navigator.vibrate)navigator.vibrate([80,40,80,40,250]);if(!S.set.fx||r<1)return;const n=[0,10,18,32,60][r],col=R[r].c,rc=el.getBoundingClientRect();
+ for(let i=0;i<n;i++){const p=document.createElement("b"),a=Math.random()*6.28,d=60+Math.random()*(60+r*40);p.className="pt";p.style.cssText=`left:${rc.left+rc.width/2}px;top:${rc.top+rc.height/2}px;background:${i%3?col:"#fff"};--x:${Math.cos(a)*d}px;--y:${Math.sin(a)*d-30}px`;document.body.appendChild(p);setTimeout(()=>p.remove(),1000)}}
+function flt(x,y,txt,col){const p=document.createElement("div");p.className="flt";p.textContent=txt;p.style.cssText=`left:${x}px;top:${y}px;color:${col}`;document.body.appendChild(p);setTimeout(()=>p.remove(),900)}
+function toast(t){const e=$("toast");e.textContent=t;e.classList.add("on");clearTimeout(toast.h);toast.h=setTimeout(()=>e.classList.remove("on"),1800)}
+function sellWhere(f){let g=0,n=0;S.cards=S.cards.filter(c=>{if(f(c)){g+=val(c);n++;return false}return true});S.money+=g;q().p.sell+=n;st().er+=g;st().sd+=n;if(n)sfx("coin");toast(n?`Продано ${n} шт. за ${fmt(g)} ₽`:"Нечего продавать")}
+document.addEventListener("click",e=>{const t=e.target;
+ if(t.closest("#mb")){$("menu").classList.add("on");return}
+ if(t.id=="menu"){$("menu").classList.remove("on");return}
+ if(t.closest("#tyb")){openTypes();return}
+ const ty=t.closest("[data-ty]");if(ty){S.type=+ty.dataset.ty;$("types").classList.remove("on");toast(TY[S.type].n+" "+TY[S.type].p);render();return}
+ if(t.closest("[data-close2]")||t.id=="types"){$("types").classList.remove("on");return}
+ const v=t.closest("[data-v]");if(v){document.querySelectorAll(".view").forEach(x=>x.classList.remove("on"));$(v.dataset.v).classList.add("on");document.body.classList.toggle("g",v.dataset.v=="gen");$("menu").classList.remove("on");render();if(v.dataset.v=="lbv")renderLb();return}
+ const cl=t.closest("[data-claim]");if(cl){const i=+cl.dataset.claim,Q=q();if(!Q.c[i]&&Q.p[TK[i].k]>=TK[i].g){Q.c[i]=1;S.money+=TK[i].rw;sfx("ok");toast("+"+fmt(TK[i].rw)+" ₽")}render();return}
+ if(t.closest("#sellAll")){const B=$("sellAll");if(!S.cards.length){toast("Коллекция пуста")}else if(sa&&Date.now()-sa<3000){sa=0;sellWhere(()=>true);B.textContent="Продать всё"}else{sa=Date.now();B.textContent="Продать всё за "+fmt(S.cards.reduce((m,c)=>m+val(c),0))+" ₽? Нажмите ещё раз";setTimeout(()=>{if(sa&&Date.now()-sa>=2900){sa=0;B.textContent="Продать всё"}},3000)}render();return}
+ const th=t.closest("[data-th]");if(th){S.set.theme=th.dataset.th;applyTheme();render();return}
+ if(t.closest("[data-pause]")||t.closest("#pz")){S.set.pause=!S.set.pause;render();return}
+ if(t.closest("[data-vib]")){S.set.vib=!S.set.vib;render();return}
+ if(t.closest("[data-reset]")){if(rs&&Date.now()-rs<3000){resetAll()}else{rs=Date.now();toast("Нажмите ещё раз, чтобы сбросить прогресс")}render();return}
+ if(t.closest("[data-snd]")){S.set.snd=!S.set.snd;sfx("ok");render();return}
+ if(t.closest("[data-fx]")){S.set.fx=!S.set.fx;render();return}
+ if(t.closest("#dlb")){const i=dlInfo();if(!i.got){i.D.d=i.t;i.D.s=i.n;S.money+=DR[i.n-1];sfx("ok");toast("Бонус дня: +"+fmt(DR[i.n-1])+" ₽")}render();return}
+ if(t.closest("#odb")){const m=odMatch();if(m){S.cards.splice(S.cards.indexOf(m),1);S.money+=S.od.rw;st().er+=S.od.rw;sfx("ok");toast("Заказ выполнен: +"+fmt(S.od.rw)+" ₽");newOrder()}render();return}
+ if(t.closest("#osk")){newOrder();render();return}
+ if(t.closest("#lbr")){renderLb();return}
+ if(t.closest("[data-cs]")){cloudSave(true);return}
+ if(t.closest("[data-cl]")){if(cl2&&Date.now()-cl2<3000){cl2=0;cloudLoad()}else{cl2=Date.now();toast("Нажмите ещё раз: прогресс на телефоне будет заменён")}return}
+ if(t.closest("[data-as]")){S.set.as=!S.set.as;render();return}
+ const ar=t.closest("[data-ar]");if(ar){const i=+ar.dataset.ar;S.set.ar[i]=S.set.ar[i]?0:1;render();return}
+ const ts=t.closest("[data-tosafe]");if(ts){const id=+ts.dataset.tosafe,i=S.cards.findIndex(x=>x.id==id);if(i>=0){if(S.safe.length>=5+5*S.lv.safe)toast("Сейф заполнен: улучшите его");else{S.safe.push(S.cards.splice(i,1)[0]);toast("Карта в сейфе")}}$("vw").classList.remove("on");render();return}
+ const us=t.closest("[data-unsafe]");if(us){const id=+us.dataset.unsafe,i=S.safe.findIndex(x=>x.id==id);if(i>=0)S.cards.push(S.safe.splice(i,1)[0]);$("vw").classList.remove("on");render();return}
+ const vw=t.closest("[data-view]");if(vw){openView(+vw.dataset.view);return}
+ if(t.closest("[data-close]")||t.id=="vw"){$("vw").classList.remove("on");return}
+ const s=t.closest("[data-s]");if(s){sellWhere(c=>c.id==+s.dataset.s);$("vw").classList.remove("on");render();return}
+ const u=t.closest("[data-u]");if(u){const d=UP.find(x=>x.k==u.dataset.u),c=cost(d);if(S.money>=c&&S.lv[d.k]<d.max){S.money-=c;S.lv[d.k]++;sfx("ok");}render();return}
+ if(t.closest("#sellRare")){sellWhere(c=>c.r==1);render();return}
+ if(t.closest("#sellEpic")){sellWhere(c=>c.r==2);render();return}
+ if(t.closest("#rew")){showAd();return}
+ if($("gen").classList.contains("on")&&!t.closest("button,header,#menu,#types,#bar,#vw,#ad")){if(busy>Date.now())return;man=true;if(open1()){if(lastCard.r>=2&&S.set.vib&&navigator.vibrate)navigator.vibrate(lastCard.r*40);if(S.set.fx){const L=lastCard,sold=S.set.as&&S.set.ar[L.r];flt(e.clientX,e.clientY,sold?"+"+fmt(val(L))+" ₽":R[L.r].n,R[L.r].c)}}else{man=false;sfx("err");toast("Не хватает ₽ — продайте карты")}render()}});
+function showAd(){$("ad").classList.add("on");let n=3;$("adt").textContent=n;const h=setInterval(()=>{n--;$("adt").textContent=n;if(n<=0){clearInterval(h);$("ad").classList.remove("on");S.boost=Date.now()+300000;toast("Доход ×2 на 5 минут");render()}},1000)}
+let acc=0;setInterval(()=>{const a=S.set.pause||busy>Date.now()?0:S.lv.auto*0.5;if(a>0){acc+=a*0.1;let n=Math.min(Math.floor(acc),60);acc-=Math.floor(acc);let ok=1;for(let i=0;i<n;i++){if(!open1()){ok=0;break}if(lastCard.r>=3)break}if(!ok){acc=0;if(Date.now()-lt>5000){lt=Date.now();toast("Авто-открытие: не хватает ₽")}}if(n>0)render()}else if(S.boost>Date.now())render()},100);
+const K="simgen_";let lastRot=0;
+function save(){try{S.t=Date.now();const c=localStorage.getItem(K+"main");
+ if(c!==null&&Date.now()-lastRot>60000){lastRot=Date.now();for(let i=3;i>1;i--){const p=localStorage.getItem(K+"bak"+(i-1));if(p!==null)localStorage.setItem(K+"bak"+i,p)}localStorage.setItem(K+"bak1",c)}
+ localStorage.setItem(K+"main",JSON.stringify(S))}catch(e){}}
+function load(){for(const k of["main","bak1","bak2","bak3"]){try{const j=localStorage.getItem(K+k);if(j){const o=JSON.parse(j);if(o&&o.lv){S=Object.assign(S,o);S.lv=Object.assign({auto:0,luck:0,price:0,safe:0},o.lv);return}}}catch(e){}}}
+load();S.cards.forEach(c=>{c.num=c.num.replace(/^\+99 (\d{2})\d /,"+7 9$1 ")});
+S.set=Object.assign({theme:"auto",pause:false,vib:true,as:true,ar:[1,0,0,0,0],snd:true,fx:true},S.set);S.safe=S.safe||[];applyTheme();if(S.lv.auto>0&&!S.set.pause){const sec=Math.min((Date.now()-S.t)/1000,7200),g=Math.floor(S.lv.auto*sec*.6*(1+0.25*S.lv.price));if(g>0){S.money+=g;setTimeout(()=>toast("Пока вас не было: +"+fmt(g)+" ₽"),400)}}
+setInterval(save,5000);document.addEventListener("visibilitychange",()=>{if(document.hidden)save()});
+buildTasks();render();
+setInterval(()=>{if($("upg").classList.contains("on"))updateTasks()},1000);
+setInterval(()=>{if(cdb&&S.opened!==lco){lco=S.opened;cloudSave(false)}},60000);
+if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
+</script>
+</body>
+</html>
